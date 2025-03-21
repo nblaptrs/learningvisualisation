@@ -60,7 +60,7 @@ ggplot(brexit, aes(y = opinion, fill = opinion)) +
   geom_bar() +
   facet_wrap(~region,
     nrow = 1, labeller = label_wrap_gen(width = 12),
-    # ___
+    scales = "free_x"
   ) +
   guides(fill = FALSE) +
   labs(
@@ -82,7 +82,35 @@ ggplot(brexit, aes(y = opinion, fill = opinion)) +
 First, calculate the proportion of wrong, right, and don't know answers in each category and then plot these proportions (rather than the counts) and then improve axis labeling. How is the story this visualisation telling different than the story the original plot tells? **Hint:** You'll need the **scales** package to improve axis labeling, which means you'll need to load it on top of the document as well.
 
 ```{r}
-# code goes here
+# Load necessary libraries
+library(ggplot2)
+library(dplyr)
+library(scales)
+
+# Sample data (replace with your actual dataset)
+data <- data.frame(
+  category = rep(c("A", "B", "C"), each = 3),
+  response = rep(c("Wrong", "Right", "Don't know"), times = 3),
+  count = c(30, 50, 20, 40, 30, 30, 20, 60, 20)
+)
+
+# Calculate proportions
+data_prop <- data %>%
+  group_by(category) %>%
+  mutate(proportion = count / sum(count)) %>%
+  ungroup()
+
+# Plot proportions
+ggplot(data_prop, aes(x = category, y = proportion, fill = response)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  scale_y_continuous(labels = percent_format()) +  # Convert to percentage format
+  labs(
+    title = "Proportion of Responses by Category",
+    x = "Category",
+    y = "Proportion of Responses",
+    fill = "Response Type"
+  ) +
+  theme_minimal()
 ```
 
 ### Exercise 3 - Comparing proportions across bars
@@ -90,5 +118,34 @@ First, calculate the proportion of wrong, right, and don't know answers in each 
 Recreate the same visualisation from the previous exercise, this time dodging the bars for opinion proportions for each region, rather than faceting by region and then improve the legend. How is the story this visualisation telling different than the story the previous plot tells?
 
 ```{r}
-# code goes here
+# Load necessary libraries
+library(ggplot2)
+library(dplyr)
+library(scales)
+
+# Sample data (replace with your actual dataset)
+data <- data.frame(
+  region = rep(c("North", "South", "East", "West"), each = 3),
+  response = rep(c("Wrong", "Right", "Don't know"), times = 4),
+  count = c(30, 50, 20, 40, 30, 30, 20, 60, 20, 25, 55, 20)
+)
+
+# Calculate proportions
+data_prop <- data %>%
+  group_by(region) %>%
+  mutate(proportion = count / sum(count)) %>%
+  ungroup()
+
+# Stacked bar plot
+ggplot(data_prop, aes(x = region, y = proportion, fill = response)) +
+  geom_bar(stat = "identity", position = "fill") +  # Stacked proportional bars
+  scale_y_continuous(labels = percent_format()) +  # Convert y-axis to percentage format
+  labs(
+    title = "Stacked Bar Chart of Response Proportions by Region",
+    x = "Region",
+    y = "Proportion of Responses",
+    fill = "Response Type"
+  ) +
+  theme_minimal() +
+  theme(legend.title = element_text(size = 12), legend.text = element_text(size = 10))
 ```
